@@ -1,6 +1,10 @@
 import { IsString, IsDateString, IsBoolean, IsOptional } from 'class-validator';
 
 export class CreateReportDto {
+  @IsOptional()
+  @IsString()
+  account_id: string;
+
   @IsString()
   table_name: string;
 

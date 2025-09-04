@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import { CreateReportDto } from './dto/create-report.dto';
 import { Report } from './entities/reports.entities';
 import { Readable } from 'stream';
-import { JsonLogger } from 'src/common/logger';
+import { JsonLogger } from '../common/logger';
 
 dotenv.config();
 
