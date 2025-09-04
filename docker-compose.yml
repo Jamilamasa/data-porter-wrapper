@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    container_name: data-porter-wrapper
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
