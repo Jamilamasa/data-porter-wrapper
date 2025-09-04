@@ -48,14 +48,22 @@ export class ReportsService {
 
   async downloadFile(referenceId: string) {
     const statusRes = await this.getStatus(referenceId);
-    if (statusRes.status !== 'COMPLETED' || !statusRes.file_url) {
-      return null;
+    // if (statusRes.status !== 'COMPLETED' || !statusRes.file_url) {
+    //   return null;
+    // }
+
+    if (statusRes.status === 'COMPLETED' && statusRes.file_url) {
+      const response = await axios.get<Readable>(statusRes.file_url, {
+        responseType: 'stream',
+      });
+      return { status: 'COMPLETED', stream: response.data };
+    } else if (statusRes.status === 'FAILED') {
+      return {
+        status: 'FAILED',
+        error_message: statusRes.error_message ?? 'Export failed',
+      };
     }
 
-    const fileUrl = statusRes.file_url;
-    const response = await axios.get<Readable>(fileUrl, {
-      responseType: 'stream',
-    });
-    return response.data;
+    return { status: 'PENDING' };
   }
 }

@@ -5,7 +5,6 @@ import {
   Param,
   Body,
   Res,
-  HttpException,
   HttpStatus,
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
@@ -31,11 +30,21 @@ export class ReportsController {
     @Param('referenceId') referenceId: string,
     @Res() res: Response,
   ) {
-    const fileStream = await this.reportsService.downloadFile(referenceId);
-    if (!fileStream) {
-      throw new HttpException({ status: 'PENDING' }, HttpStatus.CONFLICT);
+    const result = await this.reportsService.downloadFile(referenceId);
+
+    switch (result.status) {
+      case 'COMPLETED':
+        res.setHeader('Content-Type', 'text/csv');
+        return result.stream?.pipe(res);
+
+      case 'FAILED':
+        return res.status(HttpStatus.CONFLICT).json({
+          status: 'FAILED',
+          error_message: result.error_message,
+        });
+
+      case 'PENDING':
+        return res.status(HttpStatus.CONFLICT).json({ status: 'PENDING' });
     }
-    res.setHeader('Content-Type', 'text/csv');
-    fileStream.pipe(res);
   }
 }
